@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdGem Offer Health Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#0f0f11;--sf:#17171a;--sf2:#1e1e22;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);--tx:#f0f0f0;--mt:#888;--ac:#c8f064;--ac2:#64d4f0;--rd:#ff5f5f;--am:#ffb347;--gn:#6ddc8b;--pu:#b39dff;--rd-bg:rgba(255,95,95,0.08);--am-bg:rgba(255,179,71,0.08);--gn-bg:rgba(109,220,139,0.08);--pu-bg:rgba(179,157,255,0.08);--rd-bd:rgba(255,95,95,0.22);--am-bd:rgba(255,179,71,0.22);--gn-bd:rgba(109,220,139,0.22);--pu-bd:rgba(179,157,255,0.22);--r:10px;--rl:14px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
+header{padding:22px 36px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.lm{width:34px;height:34px;background:var(--rd);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#fff;}
+.lt{font-size:15px;font-weight:500;}.ls{font-size:11px;color:var(--mt);font-family:'DM Mono',monospace;}
+.wb{background:var(--sf2);border:1px solid var(--bd2);border-radius:6px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--ac);}
+nav{padding:0 36px;border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;}
+.nt{padding:13px 18px;font-size:13px;font-weight:500;color:var(--mt);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.nt.active{color:var(--ac);border-bottom-color:var(--ac);}
+.pip{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rd);margin-left:6px;vertical-align:middle;}
+main{padding:28px 36px;max-width:1440px;}
+.sec{display:none;}.sec.active{display:block;}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:22px;}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;}
+.sl{font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;font-family:'DM Mono',monospace;}
+.sv{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.1;}
+.ss{font-size:11px;color:var(--mt);margin-top:3px;}
+.al{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:8px;border:1px solid;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.al-r{background:var(--rd-bg);border-color:var(--rd-bd);color:#ffb0b0;}.al-r .dot{background:var(--rd);}
+.al-a{background:var(--am-bg);border-color:var(--am-bd);color:#ffd49a;}.al-a .dot{background:var(--am);}
+.al-g{background:var(--gn-bg);border-color:var(--gn-bd);color:#a0f0b8;}.al-g .dot{background:var(--gn);}
+.al-p{background:var(--pu-bg);border-color:var(--pu-bd);color:#d0c4ff;}.al-p .dot{background:var(--pu);}
+.stl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace;margin-bottom:12px;margin-top:22px;}
+.stl:first-child{margin-top:0;}
+.div{height:1px;background:var(--bd);margin:22px 0;}
+.mono{font-family:'DM Mono',monospace;}
+.b{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;border:1px solid;}
+.br{background:var(--rd-bg);color:var(--rd);border-color:var(--rd-bd);}
+.ba{background:var(--am-bg);color:var(--am);border-color:var(--am-bd);}
+.bg{background:var(--gn-bg);color:var(--gn);border-color:var(--gn-bd);}
+.bb{background:rgba(100,212,240,.08);color:var(--ac2);border-color:rgba(100,212,240,.2);}
+.bgr{background:rgba(255,255,255,.05);color:var(--mt);border-color:var(--bd2);}
+.bac{background:rgba(200,240,100,.1);color:var(--ac);border-color:rgba(200,240,100,.25);}
+.tw{overflow-x:auto;border-radius:var(--rl);border:1px solid var(--bd);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--sf2);}
+th{padding:9px 13px;text-align:left;font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;font-family:'DM Mono',monospace;border-bottom:1px solid var(--bd);}
+td{padding:10px 13px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.cw{position:relative;width:100%;}
+.lr{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--mt);}
+.li{display:flex;align-items:center;gap:5px;}
+.lsq{width:10px;height:10px;border-radius:2px;}
+.flag-feed{display:flex;flex-direction:column;gap:10px;}
+.fc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;}
+.fh{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
+.ft{font-size:14px;font-weight:600;}
+.fb{padding:14px 18px;}
+.wk-headers{display:grid;grid-template-columns:80px repeat(5,1fr);gap:5px;margin-top:10px;margin-bottom:3px;}
+.wk-h{font-size:10px;color:var(--mt);text-align:center;font-family:'DM Mono',monospace;}
+.wk-row{display:grid;grid-template-columns:80px repeat(5,1fr);gap:5px;margin-bottom:4px;}
+.wk-lbl{font-size:11px;color:var(--mt);display:flex;align-items:center;}
+.wk-cell{background:var(--sf2);border-radius:5px;padding:4px 6px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;border:1px solid var(--bd);}
+.wk-neg{background:var(--rd-bg);border-color:var(--rd-bd);color:var(--rd);}
+.wk-pos{background:var(--gn-bg);border-color:var(--gn-bd);color:var(--gn);}
+.wk-zero{background:var(--am-bg);border-color:var(--am-bd);color:var(--am);}
+.wk-na{color:var(--mt);}
+.action-box{background:rgba(200,240,100,.06);border:1px solid rgba(200,240,100,.2);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;}
+.action-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ac);margin-bottom:4px;}
+.action-txt{color:var(--tx);}
+.insight-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:20px;margin-bottom:12px;}
+.insight-pub{font-size:16px;font-weight:600;margin-bottom:4px;}
+.insight-sub{font-size:12px;color:var(--mt);margin-bottom:14px;font-family:'DM Mono',monospace;}
+.insight-body{font-size:13px;color:var(--mt);line-height:1.7;}.insight-body strong{color:var(--tx);font-weight:500;}
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.verdict{border-radius:var(--r);padding:12px 14px;border:1px solid;}
+.verdict-r{background:var(--rd-bg);border-color:var(--rd-bd);}
+.verdict-a{background:var(--am-bg);border-color:var(--am-bd);}
+.verdict-g{background:var(--gn-bg);border-color:var(--gn-bd);}
+.verdict-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'DM Mono',monospace;}
+.verdict-r .verdict-lbl{color:var(--rd);}
+.verdict-a .verdict-lbl{color:var(--am);}
+.verdict-g .verdict-lbl{color:var(--gn);}
+.verdict-txt{font-size:12px;color:var(--mt);line-height:1.6;}.verdict-txt strong{color:var(--tx);font-weight:500;}
+@media(max-width:600px){header,nav,main{padding-left:14px;padding-right:14px;}}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:11px">
+    <div class="lm">OH</div>
+    <div><div class="lt">AdGem Offer Health</div><div class="ls">UA AM view &middot; March 2026</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="wb">March 2026 &middot; ShopBack NZ &amp; MY</div>
+    <div style="font-size:11px;color:var(--mt);font-family:'DM Mono',monospace">Updated Mar 31, 2026</div>
+  </div>
+</header>
+<nav>
+  <div class="nt active" onclick="sw('insights',this)">Insights<span class="pip"></span></div>
+  <div class="nt" onclick="sw('nz',this)">NZ detail<span class="pip"></span></div>
+  <div class="nt" onclick="sw('my',this)">MY detail<span class="pip"></span></div>
+  <div class="nt" onclick="sw('howto',this)">How to update</div>
+</nav>
+<main>
+
+<!-- INSIGHTS -->
+<div id="insights" class="sec active">
+
+  <div class="stl" style="margin-top:0">Summary — March 2026</div>
+
+  <div class="insight-card">
+    <div class="insight-pub">ShopBack NZ</div>
+    <div class="insight-sub">Geo PM: 11.3% blended (goal 35%+) &middot; Went negative week of Mar 22-28 (-4.32% PM)</div>
+    <div class="insight-body">
+      NZ margin was largely healthy through the first three weeks of March, then went negative in week 4 and worsened further in week 5.
+      <strong>Volume is not the issue</strong> — OWL loads held flat at 18-20K every single week with no dip.
+      The margin flip is entirely driven by two campaign-level pricing problems converging in the same week:
+      Solitaire iOS/Android have been bleeding since week 2 with payout accelerating while revenue declines (event calibration issue),
+      and Cryptogram iOS/Android launched Mar 15, ran healthy for one week, then immediately flipped negative.
+      Combined campaign losses: <strong>-$5.5K</strong> across 5 flagged campaigns.
+    </div>
+    <div class="verdict-grid">
+      <div class="verdict verdict-r">
+        <div class="verdict-lbl">Volume</div>
+        <div class="verdict-txt"><strong>Not the issue.</strong> OWL loads flat 18-20K all month. Traffic is healthy.</div>
+      </div>
+      <div class="verdict verdict-r">
+        <div class="verdict-lbl">Root cause</div>
+        <div class="verdict-txt"><strong>Campaign pricing.</strong> Solitaire event calibration off since wk 2. Cryptogram miscalibrated at launch.</div>
+      </div>
+      <div class="verdict verdict-a">
+        <div class="verdict-lbl">Urgency</div>
+        <div class="verdict-txt"><strong>High.</strong> Solitaire has been worsening for 4 weeks. Cryptogram added a second bleed layer.</div>
+      </div>
+      <div class="verdict verdict-a">
+        <div class="verdict-lbl">AM action</div>
+        <div class="verdict-txt"><strong>Review event calibration</strong> on Solitaire. Review launch payout rates on Cryptogram.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="insight-pub">ShopBack MY</div>
+    <div class="insight-sub">Geo PM: 7.8% blended (goal 35%+) &middot; Negative or near-zero 3 of 5 weeks</div>
+    <div class="insight-body">
+      MY is a more complex story with <strong>two separate issues</strong> — campaign pricing and a real volume decline.
+      OWL loads dropped 23% across March (111K week 1 to 86K week 4) and clicks fell from 17.8K to 10.7K.
+      However the margin was already negative in week 2 when volume was still at 100K loads, so the campaign issues were the primary driver.
+      BlossomMatch Android and iOS launched Mar 1 with payout rates set too high from day 1 — negative all month.
+      CM Android (29517) was paused after week 1 but paid out delayed conversions for 4 more weeks against $0 revenue.
+      Combined campaign losses: <strong>-$6.8K</strong> across 4 flagged campaigns.
+    </div>
+    <div class="verdict-grid">
+      <div class="verdict verdict-a">
+        <div class="verdict-lbl">Volume</div>
+        <div class="verdict-txt"><strong>Declining — -23% across March.</strong> Contributing factor but not the primary driver.</div>
+      </div>
+      <div class="verdict verdict-r">
+        <div class="verdict-lbl">Root cause</div>
+        <div class="verdict-txt"><strong>Campaign pricing + delayed payouts.</strong> BlossomMatch miscalibrated at launch. CM Android payout tail post-pause.</div>
+      </div>
+      <div class="verdict verdict-r">
+        <div class="verdict-lbl">Urgency</div>
+        <div class="verdict-txt"><strong>High.</strong> BlossomMatch has been negative since Mar 1. Structural, not a blip.</div>
+      </div>
+      <div class="verdict verdict-a">
+        <div class="verdict-lbl">AM action</div>
+        <div class="verdict-txt"><strong>Review BlossomMatch payout rates.</strong> Investigate volume decline — separate issue from campaign pricing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stl">All flagged campaigns at a glance</div>
+  <div class="tw"><table>
+    <thead><tr>
+      <th>Geo</th><th>Campaign</th><th>OS</th><th>Type</th>
+      <th>Total rev</th><th>Total payout</th><th>Net profit</th><th>Blended PM</th>
+      <th>Flag</th><th>Root cause (one line)</th>
+    </tr></thead>
+    <tbody id="all-flags-table"></tbody>
+  </table></div>
+
+  <div class="div"></div>
+
+  <div class="stl">NZ vs MY — volume comparison all March</div>
+  <div class="lr">
+    <div class="li"><div class="lsq" style="background:#64d4f0"></div>NZ OWL loads</div>
+    <div class="li"><div class="lsq" style="background:#c8f064"></div>MY OWL loads (÷5 to scale)</div>
+  </div>
+  <div class="cw" style="height:200px"><canvas id="vol-compare-chart"></canvas></div>
+
+</div>
+
+<!-- NZ DETAIL -->
+<div id="nz" class="sec">
+  <div class="al al-r"><div class="dot"></div><div>NZ volume is completely flat all month — this is 100% a campaign pricing problem. Two issues converged in week 4: Solitaire has been bleeding since week 2, Cryptogram launched and went negative in its second week.</div></div>
+
+  <div class="sg" style="margin-top:8px">
+    <div class="sc"><div class="sl">March total rev</div><div class="sv">$35.9K</div></div>
+    <div class="sc"><div class="sl">March total payout</div><div class="sv">$31.9K</div></div>
+    <div class="sc"><div class="sl">Blended PM</div><div class="sv" style="color:var(--rd)">11.3%</div><div class="ss">Goal 35%+</div></div>
+    <div class="sc"><div class="sl">OWL loads trend</div><div class="sv" style="color:var(--gn)">Flat</div><div class="ss">18-20K all month</div></div>
+    <div class="sc"><div class="sl">Campaign losses</div><div class="sv" style="color:var(--rd)">-$5.5K</div></div>
+  </div>
+
+  <div class="stl">Weekly trends — NZ</div>
+  <div class="tw"><table>
+    <thead><tr><th>Week</th><th>Revenue</th><th>Payout</th><th>PM%</th><th>OWL loads</th><th>Clicks</th><th>Conversions</th><th>EPC</th><th>Volume vs wk1</th></tr></thead>
+    <tbody id="nz-weekly-table"></tbody>
+  </table></div>
+
+  <div class="div"></div>
+
+  <div class="stl">Revenue vs payout — NZ</div>
+  <div class="lr">
+    <div class="li"><div class="lsq" style="background:#378ADD"></div>Revenue</div>
+    <div class="li"><div class="lsq" style="background:#E24B4A"></div>Payout</div>
+    <div class="li"><div class="lsq" style="background:#6ddc8b"></div>Profit</div>
+  </div>
+  <div class="cw" style="height:200px"><canvas id="nz-rev-chart"></canvas></div>
+
+  <div class="stl" style="margin-top:1.25rem">OWL loads &amp; clicks — NZ (volume check)</div>
+  <div class="lr">
+    <div class="li"><div class="lsq" style="background:#6ddc8b;opacity:.5"></div>OWL loads (÷10)</div>
+    <div class="li"><div class="lsq" style="background:#64d4f0"></div>Distinct clicks</div>
+  </div>
+  <div class="cw" style="height:180px"><canvas id="nz-vol-chart"></canvas></div>
+
+  <div class="div"></div>
+  <div class="stl">Flagged campaigns — NZ</div>
+  <div class="flag-feed" id="nz-flags"></div>
+</div>
+
+<!-- MY DETAIL -->
+<div id="my" class="sec">
+  <div class="al al-r"><div class="dot"></div><div>MY has two problems: campaign pricing issues that started from Mar 1, and a real volume decline of -23% across March. The margin was negative before the volume dropped, so campaigns are the primary driver — but both need attention.</div></div>
+
+  <div class="sg" style="margin-top:8px">
+    <div class="sc"><div class="sl">March total rev</div><div class="sv">$31.1K</div></div>
+    <div class="sc"><div class="sl">March total payout</div><div class="sv">$28.7K</div></div>
+    <div class="sc"><div class="sl">Blended PM</div><div class="sv" style="color:var(--rd)">7.8%</div><div class="ss">Goal 35%+</div></div>
+    <div class="sc"><div class="sl">OWL loads trend</div><div class="sv" style="color:var(--am)">-23%</div><div class="ss">111K to 86K</div></div>
+    <div class="sc"><div class="sl">Campaign losses</div><div class="sv" style="color:var(--rd)">-$6.8K</div></div>
+  </div>
+
+  <div class="stl">Weekly trends — MY</div>
+  <div class="tw"><table>
+    <thead><tr><th>Week</th><th>Revenue</th><th>Payout</th><th>PM%</th><th>OWL loads</th><th>Clicks</th><th>Conversions</th><th>EPC</th><th>Volume vs wk1</th></tr></thead>
+    <tbody id="my-weekly-table"></tbody>
+  </table></div>
+
+  <div class="div"></div>
+
+  <div class="stl">Revenue vs payout — MY</div>
+  <div class="lr">
+    <div class="li"><div class="lsq" style="background:#378ADD"></div>Revenue</div>
+    <div class="li"><div class="lsq" style="background:#E24B4A"></div>Payout</div>
+    <div class="li"><div class="lsq" style="background:#6ddc8b"></div>Profit</div>
+  </div>
+  <div class="cw" style="height:200px"><canvas id="my-rev-chart"></canvas></div>
+
+  <div class="stl" style="margin-top:1.25rem">OWL loads &amp; clicks — MY (volume check)</div>
+  <div class="lr">
+    <div class="li"><div class="lsq" style="background:#6ddc8b;opacity:.5"></div>OWL loads (÷10)</div>
+    <div class="li"><div class="lsq" style="background:#64d4f0"></div>Distinct clicks</div>
+  </div>
+  <div class="cw" style="height:180px"><canvas id="my-vol-chart"></canvas></div>
+
+  <div class="div"></div>
+  <div class="stl">Flagged campaigns — MY</div>
+  <div class="flag-feed" id="my-flags"></div>
+</div>
+
+<!-- HOW TO UPDATE -->
+<div id="howto" class="sec">
+  <div class="stl" style="margin-top:0">How to update this dashboard</div>
+  <div style="display:flex;flex-direction:column;gap:14px;max-width:680px">
+    <div style="display:flex;gap:13px;align-items:flex-start">
+      <div style="width:25px;height:25px;background:var(--rd);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px">1</div>
+      <div style="font-size:13px;color:var(--mt);line-height:1.7"><strong style="color:var(--tx)">Pull the app stats export from Metabase</strong> for the relevant geos, grouped by week for the month. This gives OWL loads, clicks, conversions, revenue, payout, PM% — the volume and margin trends.</div>
+    </div>
+    <div style="display:flex;gap:13px;align-items:flex-start">
+      <div style="width:25px;height:25px;background:var(--rd);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px">2</div>
+      <div style="font-size:13px;color:var(--mt);line-height:1.7"><strong style="color:var(--tx)">Pull the campaign-level historical report</strong> for each flagged geo, grouped by week. This surfaces which specific campaigns are driving the margin issues.</div>
+    </div>
+    <div style="display:flex;gap:13px;align-items:flex-start">
+      <div style="width:25px;height:25px;background:var(--rd);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px">3</div>
+      <div style="font-size:13px;color:var(--mt);line-height:1.7"><strong style="color:var(--tx)">Upload both CSVs to Claude</strong> and specify the geo. Claude identifies flagged campaigns, root causes, and updates the data block in this file.</div>
+    </div>
+    <div style="display:flex;gap:13px;align-items:flex-start">
+      <div style="width:25px;height:25px;background:var(--rd);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px">4</div>
+      <div style="font-size:13px;color:var(--mt);line-height:1.7"><strong style="color:var(--tx)">Upload the new HTML to GitHub.</strong> Same link, updated content. Share with AMs and reference from the margin dashboard.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="stl">Flag type definitions</div>
+  <div class="tw"><table>
+    <thead><tr><th>Flag</th><th>What it means</th><th>Typical cause</th><th>AM action</th></tr></thead>
+    <tbody>
+      <tr><td><span class="b br">Negative PM</span></td><td style="color:var(--mt);font-size:12px">Payout exceeded revenue this week</td><td style="color:var(--mt);font-size:12px">Payout rate too high, event calibration off, or conversion quality drop</td><td style="color:var(--mt);font-size:12px">Review payout rate. Pause if worsening.</td></tr>
+      <tr><td><span class="b br">Zero rev / paying</span></td><td style="color:var(--mt);font-size:12px">Revenue $0 but payout still firing</td><td style="color:var(--mt);font-size:12px">Campaign paused but delayed conversions still processing</td><td style="color:var(--mt);font-size:12px">Expected if recently paused. Flag if persists beyond 2 weeks.</td></tr>
+      <tr><td><span class="b ba">Thin margin</span></td><td style="color:var(--mt);font-size:12px">PM consistently below 15% or oscillating near zero</td><td style="color:var(--mt);font-size:12px">Payout rate too close to revenue rate</td><td style="color:var(--mt);font-size:12px">Review payout rate vs advertiser CPI/CPE.</td></tr>
+      <tr><td><span class="b ba">Volume decline</span></td><td style="color:var(--mt);font-size:12px">OWL loads or clicks down 15%+ vs week 1</td><td style="color:var(--mt);font-size:12px">Offer fatigue, seasonality, or traffic source change</td><td style="color:var(--mt);font-size:12px">Investigate with ShopBack — may need new offer mix.</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+</main>
+<script>
+/* ═══ DATA ═══ */
+var WEEKS = ["Mar 1-7","Mar 8-14","Mar 15-21","Mar 22-28","Mar 29+"];
+
+var NZ_WEEKLY = [
+  {w:"Mar 1-7",   rev:7589, pay:5694, pm:24.96, owls:18255, clicks:2696, convs:4560, epc:2.11},
+  {w:"Mar 8-14",  rev:7624, pay:6828, pm:10.44, owls:19093, clicks:2656, convs:4710, epc:2.57},
+  {w:"Mar 15-21", rev:9131, pay:6674, pm:26.91, owls:20189, clicks:2860, convs:5036, epc:2.33},
+  {w:"Mar 22-28", rev:8235, pay:8591, pm:-4.32, owls:19033, clicks:2635, convs:5278, epc:3.26},
+  {w:"Mar 29+",   rev:3372, pay:4106, pm:-21.77,owls:7492,  clicks:978,  convs:1989, epc:4.20}
+];
+
+var MY_WEEKLY = [
+  {w:"Mar 1-7",   rev:9836, pay:7548, pm:23.26, owls:111567, clicks:17840, convs:13944, epc:0.42},
+  {w:"Mar 8-14",  rev:7668, pay:8255, pm:-7.65, owls:100724, clicks:14395, convs:12435, epc:0.57},
+  {w:"Mar 15-21", rev:5895, pay:5777, pm:2.00,  owls:85410,  clicks:11483, convs:9567,  epc:0.50},
+  {w:"Mar 22-28", rev:5118, pay:5213, pm:-1.87, owls:86500,  clicks:10674, convs:9964,  epc:0.49},
+  {w:"Mar 29+",   rev:2585, pay:1877, pm:27.38, owls:39892,  clicks:5163,  convs:4536,  epc:0.36}
+];
+
+var NZ_CAMPAIGNS = [
+  {name:"Solitaire iOS",     os:"iOS",     type:"CPI", rev:3204, pay:6096,  profit:-2892, pm:-90.3, flag:"negative-pm",    cause:"Payout tripling WoW while revenue falls. Event calibration issue — users converting but events not generating advertiser revenue at same rate.", action:"Review event calibration with advertiser. Payout rate needs to reflect actual revenue per qualifying event."},
+  {name:"Solitaire Android", os:"Android", type:"CPI", rev:1903, pay:2831,  profit:-928,  pm:-48.8, flag:"negative-pm",    cause:"Same pattern as iOS — negative since week 2 and worsening each week. Treat as one investigation with Solitaire iOS.", action:"Pause or reduce payout rate. Same fix as Solitaire iOS."},
+  {name:"Cryptogram iOS",    os:"iOS",     type:"CPI", rev:1095, pay:1450,  profit:-355,  pm:-32.4, flag:"negative-pm",    cause:"Launched Mar 15 healthy (64% PM), flipped negative week 2. New campaign with payout rate set too high vs actual traffic quality.", action:"Review launch payout rate. Likely needs repricing before re-enabling."},
+  {name:"Cryptogram Android",os:"Android", type:"CPI", rev:522,  pay:744,   profit:-221,  pm:-42.4, flag:"negative-pm",    cause:"Identical pattern to Cryptogram iOS — paired launch, same pricing issue on both platforms.", action:"Same fix as Cryptogram iOS. Treat as paired investigation."},
+  {name:"SCO Android",       os:"Android", type:"CPE", rev:410,  pay:610,   profit:-201,  pm:-49.0, flag:"negative-pm",    cause:"Negative all 5 weeks with no self-correction. Multi-geo campaign — issue likely structural across all geos it runs in.", action:"Review CPE rate and event quality across all target geos."},
+  {
+    name:"Solitaire iOS", os:"iOS", type:"CPI", skip:true,
+    weeks:[
+      {w:"Mar 1-7",   rev:892, pay:798,  pm:10.6},
+      {w:"Mar 8-14",  rev:808, pay:1241, pm:-53.6},
+      {w:"Mar 15-21", rev:680, pay:1524, pm:-124.1},
+      {w:"Mar 22-28", rev:584, pay:1800, pm:-208.2},
+      {w:"Mar 29+",   rev:240, pay:733,  pm:-205.5}
+    ]
+  }
+];
+
+var NZ_CAMP_DETAIL = [
+  {name:"Solitaire iOS (30063)",     os:"iOS",     type:"CPI", rev:3204, pay:6096,  profit:-2892, pm:-90.3, flag:"negative-pm",    cause:"Payout tripling week over week while revenue falls. Event calibration issue — users converting but events not generating advertiser revenue at same rate. Worsening for 4 consecutive weeks.", action:"Review event calibration with advertiser. Payout rate needs to reflect revenue per qualifying event, not just install count.",
+    weeks:[{w:"Mar 1-7",rev:892,pay:798,pm:10.6},{w:"Mar 8-14",rev:808,pay:1241,pm:-53.6},{w:"Mar 15-21",rev:680,pay:1524,pm:-124.1},{w:"Mar 22-28",rev:584,pay:1800,pm:-208.2},{w:"Mar 29+",rev:240,pay:733,pm:-205.5}]},
+  {name:"Solitaire Android (30064)", os:"Android", type:"CPI", rev:1903, pay:2831,  profit:-928,  pm:-48.8, flag:"negative-pm",    cause:"Same pattern as iOS — negative since week 2 and worsening. Revenue declining while payout climbs. Treat as one investigation with iOS.", action:"Pause or reduce payout rate. Same root cause as Solitaire iOS.",
+    weeks:[{w:"Mar 1-7",rev:660,pay:488,pm:26.0},{w:"Mar 8-14",rev:484,pay:844,pm:-74.4},{w:"Mar 15-21",rev:379,pay:595,pm:-56.8},{w:"Mar 22-28",rev:272,pay:483,pm:-77.6},{w:"Mar 29+",rev:108,pay:421,pm:-290.2}]},
+  {name:"Cryptogram iOS (30279)",    os:"iOS",     type:"CPI", rev:1095, pay:1450,  profit:-355,  pm:-32.4, flag:"negative-pm",    cause:"Launched Mar 15 at 64% PM. Flipped to -52% in week 2 then -201% in week 3. New campaign with payout rate set too high relative to traffic quality delivered.", action:"Review launch payout rate. New campaigns that flip negative in week 2 typically have a pricing mismatch from setup.",
+    weeks:[{w:"Mar 1-7",rev:0,pay:0,pm:null},{w:"Mar 8-14",rev:0,pay:0,pm:null},{w:"Mar 15-21",rev:360,pay:128,pm:64.6},{w:"Mar 22-28",rev:600,pay:916,pm:-52.6},{w:"Mar 29+",rev:135,pay:407,pm:-201.4}]},
+  {name:"Cryptogram Android (30282)",os:"Android", type:"CPI", rev:522,  pay:744,   profit:-221,  pm:-42.4, flag:"negative-pm",    cause:"Identical launch pattern to Cryptogram iOS. Healthy week 1, negative weeks 2-3. Paired iOS/Android launch with same miscalibrated payout rates.", action:"Same fix as Cryptogram iOS. Treat as one investigation.",
+    weeks:[{w:"Mar 1-7",rev:0,pay:0,pm:null},{w:"Mar 8-14",rev:0,pay:0,pm:null},{w:"Mar 15-21",rev:147,pay:71,pm:51.6},{w:"Mar 22-28",rev:261,pay:431,pm:-64.9},{w:"Mar 29+",rev:114,pay:242,pm:-112.2}]},
+  {name:"SCO Android (29801)",       os:"Android", type:"CPE", rev:410,  pay:610,   profit:-201,  pm:-49.0, flag:"negative-pm",    cause:"Negative all 5 weeks with no self-correction. Multi-geo campaign — issue likely structural across all geos, not NZ-specific.", action:"Review CPE rate and event quality across all geos this campaign runs in.",
+    weeks:[{w:"Mar 1-7",rev:120,pay:200,pm:-67.0},{w:"Mar 8-14",rev:90,pay:162,pm:-79.5},{w:"Mar 15-21",rev:68,pay:102,pm:-51.4},{w:"Mar 22-28",rev:96,pay:100,pm:-4.7},{w:"Mar 29+",rev:36,pay:45,pm:-25.9}]}
+];
+
+var MY_CAMP_DETAIL = [
+  {name:"CM Android APAC — paused (29517)", os:"Android", type:"CPE", rev:1323, pay:4733, profit:-3410, pm:-257.7, flag:"zero-rev-paying",  cause:"Ran one week then paused. Delayed event conversions kept firing for 4 more weeks with $0 revenue — $1,388, $838, $463, $84 in payout after pause. Post-pause conversion tail.", action:"Expected behavior after a pause. Flag if still paying out beyond week 6. No payout rate change needed — will clear naturally.",
+    weeks:[{w:"Mar 1-7",rev:1323,pay:1960,pm:-48.1},{w:"Mar 8-14",rev:0,pay:1388,pm:null},{w:"Mar 15-21",rev:0,pay:838,pm:null},{w:"Mar 22-28",rev:0,pay:463,pm:null},{w:"Mar 29+",rev:0,pay:84,pm:null}]},
+  {name:"BlossomMatch Android (30062)",      os:"Android", type:"CPI", rev:1915, pay:4251, profit:-2336, pm:-122.0, flag:"negative-pm",       cause:"Negative from day 1 — launched Mar 1 at -57% PM and worsened to -196% by week 3. Revenue declining every week while payout stays elevated. Pricing miscalibrated at launch.", action:"Review CPI payout rate vs advertiser bid. Consider pausing and repricing before relaunching.",
+    weeks:[{w:"Mar 1-7",rev:606,pay:951,pm:-57.1},{w:"Mar 8-14",rev:485,pay:1368,pm:-182.3},{w:"Mar 15-21",rev:370,pay:1095,pm:-196.3},{w:"Mar 22-28",rev:272,pay:653,pm:-140.5},{w:"Mar 29+",rev:183,pay:183,pm:0.4}]},
+  {name:"BlossomMatch iOS (30061)",          os:"iOS",     type:"CPI", rev:1160, pay:2252, profit:-1092, pm:-94.1,  flag:"negative-pm",       cause:"Same launch issue as Android — negative from week 1 at -83% PM. Improving in final weeks but still hasn't crossed into positive. Paired campaign with Android.", action:"Same fix as BlossomMatch Android. Treat as one investigation — payout rates were set together.",
+    weeks:[{w:"Mar 1-7",rev:322,pay:590,pm:-83.2},{w:"Mar 8-14",rev:264,pay:732,pm:-177.2},{w:"Mar 15-21",rev:190,pay:419,pm:-120.4},{w:"Mar 22-28",rev:202,pay:354,pm:-75.0},{w:"Mar 29+",rev:182,pay:158,pm:13.2}]},
+  {name:"MPY iOS Tier2 (29341)",             os:"iOS",     type:"CPI", rev:2945, pay:3024, profit:-79,   pm:-2.7,   flag:"thin-margin",       cause:"Oscillates positive and negative each week. Decent volume but payout rate is too close to revenue rate to absorb any variability in conversion quality.", action:"Small payout rate reduction would stabilize margin. Not urgent but contributes to structural MY weakness.",
+    weeks:[{w:"Mar 1-7",rev:905,pay:739,pm:18.3},{w:"Mar 8-14",rev:685,pay:879,pm:-28.3},{w:"Mar 15-21",rev:540,pay:458,pm:15.3},{w:"Mar 22-28",rev:585,pay:738,pm:-26.2},{w:"Mar 29+",rev:230,pay:210,pm:8.6}]}
+];
+
+/* ═══ HELPERS ═══ */
+function pmColor(pm) {
+  if (pm === null) return "var(--mt)";
+  if (pm < 0) return "var(--rd)";
+  if (pm < 10) return "var(--am)";
+  return "var(--gn)";
+}
+function flagBadge(f) {
+  if (f === "negative-pm") return '<span class="b br">Negative PM</span>';
+  if (f === "zero-rev-paying") return '<span class="b br">Zero rev / paying</span>';
+  return '<span class="b ba">Thin margin</span>';
+}
+function fmtProfit(v) {
+  return (v < 0 ? "-" : "+") + "$" + Math.abs(v).toLocaleString();
+}
+function volVsWk1(data, i) {
+  if (i === 0) return "<span style='color:var(--mt);font-size:12px'>Baseline</span>";
+  var pct = ((data[i].owls - data[0].owls) / data[0].owls * 100);
+  var color = pct < -15 ? "var(--rd)" : pct < -5 ? "var(--am)" : "var(--gn)";
+  return "<span style='font-size:12px;font-family:DM Mono,monospace;color:" + color + "'>" + (pct > 0 ? "+" : "") + pct.toFixed(0) + "% OWLs</span>";
+}
+
+/* ═══ ALL FLAGS TABLE ═══ */
+var allFlagsEl = document.getElementById("all-flags-table");
+var allRows = [];
+NZ_CAMP_DETAIL.forEach(function(c){ allRows.push({geo:"NZ", c:c}); });
+MY_CAMP_DETAIL.forEach(function(c){ allRows.push({geo:"MY", c:c}); });
+allRows.sort(function(a,b){ return a.c.profit - b.c.profit; });
+allRows.forEach(function(x) {
+  var c = x.c;
+  var tr = document.createElement("tr");
+  tr.innerHTML = "<td><span class='b " + (x.geo==="NZ"?"bb":"bp") + "'>" + x.geo + "</span></td>"
+    + "<td style='font-weight:500;font-size:12px'>" + c.name + "</td>"
+    + "<td><span class='b bgr'>" + c.os + "</span></td>"
+    + "<td><span class='b bgr'>" + c.type + "</span></td>"
+    + "<td class='mono'>$" + c.rev.toLocaleString() + "</td>"
+    + "<td class='mono'>$" + c.pay.toLocaleString() + "</td>"
+    + "<td class='mono' style='color:" + (c.profit<0?"var(--rd)":"var(--gn)") + ";font-weight:500'>" + fmtProfit(c.profit) + "</td>"
+    + "<td class='mono' style='color:" + pmColor(c.pm) + ";font-weight:500'>" + c.pm.toFixed(1) + "%</td>"
+    + "<td>" + flagBadge(c.flag) + "</td>"
+    + "<td style='font-size:12px;color:var(--mt);max-width:200px'>" + c.cause.split(".")[0] + ".</td>";
+  allFlagsEl.appendChild(tr);
+});
+
+/* ═══ WEEKLY TABLES ═══ */
+function buildWeeklyTable(data, tbodyId) {
+  var tb = document.getElementById(tbodyId);
+  data.forEach(function(d, i) {
+    var tr = document.createElement("tr");
+    if (d.pm < 0) tr.style.background = "rgba(255,95,95,0.04)";
+    tr.innerHTML = "<td style='font-weight:500;white-space:nowrap'>" + d.w + "</td>"
+      + "<td class='mono'>$" + (d.rev/1000).toFixed(1) + "K</td>"
+      + "<td class='mono'>$" + (d.pay/1000).toFixed(1) + "K</td>"
+      + "<td class='mono' style='color:" + pmColor(d.pm) + ";font-weight:500'>" + d.pm.toFixed(2) + "%</td>"
+      + "<td class='mono'>" + Math.round(d.owls/1000) + "K</td>"
+      + "<td class='mono'>" + (d.clicks/1000).toFixed(1) + "K</td>"
+      + "<td class='mono'>" + (d.convs/1000).toFixed(1) + "K</td>"
+      + "<td class='mono'>$" + d.epc.toFixed(2) + "</td>"
+      + "<td>" + volVsWk1(data, i) + "</td>";
+    tb.appendChild(tr);
+  });
+}
+buildWeeklyTable(NZ_WEEKLY, "nz-weekly-table");
+buildWeeklyTable(MY_WEEKLY, "my-weekly-table");
+
+/* ═══ FLAG CARDS ═══ */
+function buildFlagCards(camps, containerId) {
+  var container = document.getElementById(containerId);
+  camps.forEach(function(c) {
+    var card = document.createElement("div"); card.className = "fc";
+    card.style.borderColor = c.profit < 0 ? "var(--rd-bd)" : "var(--am-bd)";
+
+    var hdr = document.createElement("div"); hdr.className = "fh";
+    var hLeft = document.createElement("div");
+    var title = document.createElement("div"); title.className = "ft"; title.textContent = c.name;
+    var badges = document.createElement("div"); badges.style.cssText = "display:flex;gap:6px;flex-wrap:wrap;margin-top:5px";
+    badges.innerHTML = flagBadge(c.flag) + ' <span class="b bgr">' + c.os + '</span> <span class="b bgr">' + c.type + '</span>';
+    hLeft.appendChild(title); hLeft.appendChild(badges);
+    var hRight = document.createElement("div"); hRight.style.textAlign = "right";
+    var profEl = document.createElement("div");
+    profEl.style.cssText = "font-size:20px;font-weight:600;color:" + (c.profit<0?"var(--rd)":"var(--gn)");
+    profEl.textContent = fmtProfit(c.profit);
+    var pmEl = document.createElement("div");
+    pmEl.style.cssText = "font-size:12px;color:var(--mt);font-family:DM Mono,monospace";
+    pmEl.textContent = "Blended PM: " + c.pm.toFixed(1) + "%";
+    hRight.appendChild(profEl); hRight.appendChild(pmEl);
+    hdr.appendChild(hLeft); hdr.appendChild(hRight);
+    card.appendChild(hdr);
+
+    var body = document.createElement("div"); body.className = "fb";
+
+    /* cause */
+    var causeLabel = document.createElement("div");
+    causeLabel.style.cssText = "font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;font-family:DM Mono,monospace";
+    causeLabel.textContent = "Root cause";
+    var causeText = document.createElement("div");
+    causeText.style.cssText = "font-size:13px;color:var(--tx);margin-bottom:10px;line-height:1.6";
+    causeText.textContent = c.cause;
+    body.appendChild(causeLabel); body.appendChild(causeText);
+
+    /* week grid headers */
+    var hdrGrid = document.createElement("div"); hdrGrid.className = "wk-headers";
+    var blank = document.createElement("div"); hdrGrid.appendChild(blank);
+    WEEKS.forEach(function(wl) {
+      var h = document.createElement("div"); h.className = "wk-h"; h.textContent = wl;
+      hdrGrid.appendChild(h);
+    });
+    body.appendChild(hdrGrid);
+
+    /* metric rows */
+    ["Revenue","Payout","PM%"].forEach(function(metric) {
+      var row = document.createElement("div"); row.className = "wk-row";
+      var lbl = document.createElement("div"); lbl.className = "wk-lbl"; lbl.textContent = metric;
+      row.appendChild(lbl);
+      c.weeks.forEach(function(wk) {
+        var cell = document.createElement("div"); cell.className = "wk-cell";
+        var val, cls;
+        if (metric === "Revenue") {
+          val = wk.rev === 0 ? "$0" : "$" + (wk.rev/1000).toFixed(1) + "K";
+          cls = wk.rev === 0 ? "wk-zero" : "wk-pos";
+        } else if (metric === "Payout") {
+          val = "$" + (wk.pay/1000).toFixed(1) + "K";
+          cls = (wk.rev === 0 && wk.pay > 0) ? "wk-zero" : "wk-na";
+        } else {
+          if (wk.pm === null) { val = "\u2014"; cls = "wk-na"; }
+          else { val = wk.pm.toFixed(0) + "%"; cls = wk.pm < 0 ? "wk-neg" : wk.pm < 10 ? "wk-zero" : "wk-pos"; }
+        }
+        cell.textContent = val; cell.classList.add(cls);
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
+    });
+
+    /* action */
+    var ab = document.createElement("div"); ab.className = "action-box";
+    var abl = document.createElement("div"); abl.className = "action-lbl"; abl.textContent = "AM action";
+    var abt = document.createElement("div"); abt.className = "action-txt"; abt.textContent = c.action;
+    ab.appendChild(abl); ab.appendChild(abt);
+    body.appendChild(ab);
+
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+buildFlagCards(NZ_CAMP_DETAIL, "nz-flags");
+buildFlagCards(MY_CAMP_DETAIL, "my-flags");
+
+/* ═══ CHARTS ═══ */
+Chart.defaults.color = "#888";
+Chart.defaults.borderColor = "rgba(255,255,255,.06)";
+
+function makeRevChart(id, data) {
+  new Chart(document.getElementById(id), {
+    type: "line",
+    data: {
+      labels: WEEKS,
+      datasets: [
+        {label:"Revenue", data:data.map(function(d){return d.rev/1000;}), borderColor:"#378ADD", tension:.3, pointRadius:4, fill:false, borderWidth:2},
+        {label:"Payout",  data:data.map(function(d){return d.pay/1000;}), borderColor:"#E24B4A", tension:.3, pointRadius:4, fill:false, borderWidth:2},
+        {label:"Profit",  data:data.map(function(d){return (d.rev-d.pay)/1000;}), borderColor:"#6ddc8b", tension:.3, pointRadius:3, fill:false, borderWidth:1.5, borderDash:[4,3]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:11}},grid:{display:false}},y:{ticks:{callback:function(v){return "$"+v+"K";},font:{size:11}}}}}
+  });
+}
+
+function makeVolChart(id, data) {
+  new Chart(document.getElementById(id), {
+    type: "bar",
+    data: {
+      labels: WEEKS,
+      datasets: [
+        {label:"OWL loads /10", data:data.map(function(d){return Math.round(d.owls/10);}), backgroundColor:"rgba(109,220,139,0.25)", borderColor:"#6ddc8b", borderWidth:1.5, borderRadius:3},
+        {label:"Clicks",        data:data.map(function(d){return d.clicks;}), backgroundColor:"rgba(100,212,240,0.4)", borderColor:"#64d4f0", borderWidth:1.5, borderRadius:3}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:11}},grid:{display:false}},y:{ticks:{font:{size:11}}}}}
+  });
+}
+
+makeRevChart("nz-rev-chart", NZ_WEEKLY);
+makeRevChart("my-rev-chart", MY_WEEKLY);
+makeVolChart("nz-vol-chart", NZ_WEEKLY);
+makeVolChart("my-vol-chart", MY_WEEKLY);
+
+/* volume compare */
+new Chart(document.getElementById("vol-compare-chart"), {
+  type: "line",
+  data: {
+    labels: WEEKS,
+    datasets: [
+      {label:"NZ OWL loads", data:NZ_WEEKLY.map(function(d){return Math.round(d.owls/1000);}), borderColor:"#64d4f0", tension:.3, pointRadius:4, fill:false, borderWidth:2},
+      {label:"MY OWL loads /5", data:MY_WEEKLY.map(function(d){return Math.round(d.owls/5000);}), borderColor:"#c8f064", tension:.3, pointRadius:4, fill:false, borderWidth:2, borderDash:[5,3]}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+ctx.raw+"K"+(ctx.datasetIndex===1?" (x5 actual)":"");}} }},
+    scales:{x:{ticks:{font:{size:11}},grid:{display:false}},y:{ticks:{callback:function(v){return v+"K";},font:{size:11}}}}}
+});
+
+/* ═══ TAB SWITCHING ═══ */
+function sw(id, el) {
+  var tabs = document.querySelectorAll(".nt");
+  var secs = document.querySelectorAll(".sec");
+  for (var i=0;i<tabs.length;i++) tabs[i].classList.remove("active");
+  for (var i=0;i<secs.length;i++) secs[i].classList.remove("active");
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
+}
+</script>
+</body>
+</html>
